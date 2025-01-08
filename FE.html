@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Young Professionals</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <div class="card">
+      <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Add Young Professionals</h5>
+      </div>
+      <div class="card-body">
+          <form id="young-professionals-form">
+              <!-- Wing and Division -->
+              <div class="row mb-3">
+                  <div class="col-md-6">
+                      <label for="wing" class="form-label">Wing <span class="text-danger">*</span></label>
+                      <select id="wing" class="form-select" required>
+                        <option value="">--Select Wing--</option>
+                        <option value="wing1">Wing 1</option>
+                        <option value="wing2">Wing 2</option>
+                      </select>
+                  </div>
+                  <div class="col-md-6">
+                      <label for="division" class="form-label">Division <span class="text-danger">*</span></label>
+                      <select id="division" class="form-select" required>
+                          <option selected disabled>--Select Division--</option>
+                          <option value="division1">Division 1</option>
+                          <option value="division2">Division 2</option>
+                      </select>
+                  </div>
+              </div>
+
+              <!-- Post Status -->
+              <div class="mb-3">
+                  <label class="form-label">Post Status</label>
+                  <div class="form-check">
+                      <input class="form-check-input" type="radio" name="status" id="vacant" value="vacant" required>
+                      <label class="form-check-label" for="vacant">Vacant</label>
+                  </div>
+                  <div class="form-check">
+                      <input class="form-check-input" type="radio" name="status" id="filled" value="filled" required>
+                      <label class="form-check-label" for="filled">Filled</label>
+                  </div>
+              </div>
+
+              <!-- Date Fields -->
+              <div class="row mb-3">
+                  <div class="col-md-4">
+                      <label for="dateArise" class="form-label">Date of Arise in Vacancy <span class="text-danger">*</span></label>
+                      <input type="date"  id="date-vacancy-arise"  class="form-control" required>
+                  </div>
+                  <div class="col-md-4">
+                      <label for="dateAdvertised" class="form-label">Date of Vacancy Advertised</label>
+                      <input type="date" id="date-vacancy-advertised" class="form-control">
+                  </div>
+                  <div class="col-md-4">
+                      <label for="dateAppointment" class="form-label">Date of Appointment</label>
+                      <input type="date" id="date-appointment" class="form-control">
+                  </div>
+              </div>
+
+              <!-- Candidate Details -->
+              <div class="mb-3">
+                  <label class="form-label">Candidate Details</label>
+                  <button type="button" class="btn btn-success">
+                      <i class="bi bi-plus"></i> Add Candidate
+                  </button>
+              </div>
+
+              <!-- Submit and Cancel Buttons -->
+              <div class="d-flex justify-content-end">
+                  <button type="submit" class="btn btn-success me-2">Submit</button>
+                  <button type="button" class="btn btn-danger">Cancel</button>
+              </div>
+          </form>
+      </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const vacantRadio = document.getElementById('vacant');
+    const filledRadio = document.getElementById('filled');
+    const dateVacancyArise = document.getElementById('date-vacancy-arise');
+    const dateVacancyAdvertised = document.getElementById('date-vacancy-advertised');
+    const dateAppointment = document.getElementById('date-appointment');
+
+    function handleStatusChange() {
+      if (vacantRadio.checked) {
+        dateVacancyArise.disabled = false;
+        dateVacancyAdvertised.disabled = false;
+        dateAppointment.disabled = true;
+        dateAppointment.value = '';
+      } else if (filledRadio.checked) {
+        dateVacancyArise.disabled = true;
+        dateVacancyAdvertised.disabled = true;
+        dateAppointment.disabled = false;
+        dateVacancyArise.value = '';
+        dateVacancyAdvertised.value = '';
+      }
+    }
+
+    vacantRadio.addEventListener('change', handleStatusChange);
+    filledRadio.addEventListener('change', handleStatusChange);
+
+    // document.getElementById('young-professionals-form').addEventListener('submit', (e) => {
+    //   e.preventDefault();
+    //   alert('Form submitted successfully!');
+    // });
+  </script>
+  <script>
+    document.getElementById('young-professionals-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      // Collect form data
+      const wing = document.getElementById('wing').value;
+      const division = document.getElementById('division').value;
+      const status = document.querySelector('input[name="status"]:checked')?.value;
+      const dateVacancyArise = document.getElementById('date-vacancy-arise').value;
+      const dateVacancyAdvertised = document.getElementById('date-vacancy-advertised').value;
+      const dateAppointment = document.getElementById('date-appointment').value;
+
+      // Prepare data to send
+      const data = {
+        wing,
+        division,
+        status,
+        dateVacancyArise,
+        dateVacancyAdvertised,
+        dateAppointment,
+      };
+
+      console.log(JSON.stringify(data));
+
+      try {
+        // Make the API call
+        const response = await fetch('http://localhost:3000/api/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          const result = await response.text();
+          alert('Form submitted successfully: ' + result);
+        } else {
+          const error = await response.text();
+          alert('Error submitting form: ' + error);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        alert('An unexpected error occurred.');
+      }
+    });
+
+  </script>
+
+</body>
+
+</html>
